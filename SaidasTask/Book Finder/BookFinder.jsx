@@ -25,18 +25,20 @@ const BookFinder = () => {
 
     try {
       const res = await fetch(
-        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
+        `https://openlibrary.org/search.json?title=${encodeURIComponent(
+          query
+        )}&limit=50`
       );
       const data = await res.json();
 
       if (data.docs && data.docs.length > 0) {
-        setBooks(data.docs.slice(0, 100)); // load more for filtering
+        setBooks(data.docs); // no need to slice
       } else {
         setError("No books found.");
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch books.");
+      setError("Failed to fetch books. Try again later.");
     } finally {
       setLoading(false);
     }
@@ -142,20 +144,22 @@ const BookFinder = () => {
           return (
             <div key={idx} className={styles.card}>
               <img src={coverUrl} alt={book.title} className={styles.cover} />
-              <h3>{book.title}</h3>
-              <p>
-                {book.author_name?.join(", ") || "Unknown Author"}
-                <br />
-                {book.first_publish_year || "N/A"}
-              </p>
-              <a
-                href={`https://openlibrary.org${book.key}`}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.link}
-              >
-                View Details
-              </a>
+              <div className={styles.overlay}>
+                <h3>{book.title}</h3>
+                <p>
+                  {book.author_name?.join(", ") || "Unknown Author"}
+                  <br />
+                  {book.first_publish_year || "N/A"}
+                </p>
+                <a
+                  href={`https://openlibrary.org${book.key}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.link}
+                >
+                  View Details
+                </a>
+              </div>
             </div>
           );
         })}
